@@ -1,5 +1,7 @@
 package main
 
+import "awesomeProject/CustomModule"
+
 func main() {
-	slice()
+	CustomModule.Findian()
 }
