@@ -1,7 +1,10 @@
 package main
 
-import "awesomeProject/CustomModule"
+import (
+	//"awesomeProject/CourseOne"
+	"awesomeProject/CourseTwo"
+)
 
 func main() {
-	CustomModule.Findian()
+	CourseTwo.BubbleSort()
 }

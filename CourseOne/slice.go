@@ -1,4 +1,4 @@
-package CustomModule
+package CourseOne
 
 import (
 	"fmt"
