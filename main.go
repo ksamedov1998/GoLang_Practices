@@ -6,5 +6,5 @@ import (
 )
 
 func main() {
-	CourseTwo.BubbleSort()
+	CourseTwo.PrintCalculatedAcceleration()
 }
