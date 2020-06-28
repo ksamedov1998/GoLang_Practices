@@ -7,84 +7,124 @@ import (
 	"strings"
 )
 
-type Animal struct {
+type Animal interface {
+	Eat()
+	Move()
+	Speak()
+}
+
+type Bird struct {
+	name  string
+	eat   string
+	move  string
+	speak string
+}
+type Cow struct {
+	name  string
+	eat   string
+	move  string
+	speak string
+}
+type Snake struct {
+	name  string
 	eat   string
 	move  string
 	speak string
 }
 
-func CreateAnimal(eat string, move string, speak string) Animal {
-	animalObj := *(new(Animal))
-	animalObj.eat = eat
-	animalObj.move = move
-	animalObj.speak = speak
-	return animalObj
+//Bird
+func (bird Bird) Eat() {
+	fmt.Println(bird.eat)
+}
+func (bird Bird) Speak() {
+	fmt.Println(bird.speak)
+}
+func (bird Bird) Move() {
+	fmt.Println(bird.move)
 }
 
-func (animalObj *Animal) Eat() string {
-	return animalObj.eat
+//Snake
+func (snake Snake) Eat() {
+	fmt.Println(snake.eat)
+}
+func (snake Snake) Speak() {
+	fmt.Println(snake.speak)
+}
+func (snake Snake) Move() {
+	fmt.Println(snake.move)
 }
 
-func (animalObj *Animal) Move() string {
-	return animalObj.move
+//Cow
+func (cow Cow) Eat() {
+	fmt.Println(cow.eat)
 }
-
-func (animalObj *Animal) Speak() string {
-	return animalObj.speak
+func (cow Cow) Speak() {
+	fmt.Println(cow.speak)
 }
-
-func main() {
-	var line string
-	animalMap := CreateAnimals()
-	for {
-		fmt.Print(">")
-		reader := bufio.NewReader(os.Stdin)
-		line, _ = reader.ReadString('\n')
-		sliceOfLine := strings.Split(line, " ")
-		animal, isRight := FindAnimal(sliceOfLine[0], animalMap)
-		if isRight {
-			PrintRequestedProperty(sliceOfLine[1], animal)
-		} else {
-			fmt.Println("Wrong animal name")
-		}
-	}
+func (cow Cow) Move() {
+	fmt.Println(cow.move)
 }
 
 func PrintRequestedProperty(property string, animal Animal) {
 	if strings.TrimRight(property, "\n") == "eat" {
-		fmt.Println(animal.Eat())
+		animal.Eat()
 	} else if strings.TrimRight(property, "\n") == "move" {
-		fmt.Println(animal.Move())
+		animal.Move()
 	} else if strings.TrimRight(property, "\n") == "speak" {
-		fmt.Println(animal.Speak())
+		animal.Speak()
 	} else {
 		fmt.Println("Wrong animal property")
 	}
 }
 
-func FindAnimal(s string, animalMap map[string]Animal) (Animal, bool) {
-	var animal Animal
-	isRight := true
-	switch s {
-	case "cow":
-		animal = animalMap["cow"]
-	case "bird":
-		animal = animalMap["bird"]
-	case "snake":
-		animal = animalMap["snake"]
-	default:
-		isRight = false
-	}
-	return animal, isRight
+func FindAnimal(name string, animalMap map[string]Animal) (Animal, bool) {
+	return animalMap[name], animalMap[name] != nil
 }
 
-func CreateAnimals() map[string]Animal {
-	sliceOfAnimals := make(map[string]Animal)
-	cow := CreateAnimal("grass", "walk", "moo")
-	bird := CreateAnimal("worms", "fly", "peep")
-	snake := CreateAnimal("mice", "slither", "hsss")
-	sliceOfAnimals["cow"] = cow
-	sliceOfAnimals["snake"] = snake
-	sliceOfAnimals["bird"] = bird
-	return sliceOfAnimals
+func CreateAnimal(animalName string, animalType string) Animal {
+	var animal Animal
+	switch animalType {
+	case "cow":
+		cow := Cow{animalName, "grass", "walk", "moo"}
+		animal = cow
+	case "bird":
+		bird := Bird{animalName, "worms", "fly", "peep"}
+		animal = bird
+	case "snake":
+		snake := Cow{animalName, "mice", "slither", "hsss"}
+		animal = snake
+	}
+	return animal
+}
+
+func main() {
+	var line string
+	animalMap := make(map[string]Animal)
+	for {
+		fmt.Print(">")
+		reader := bufio.NewReader(os.Stdin)
+		line, _ = reader.ReadString('\n')
+		sliceOfLine := strings.Split(line, " ")
+		if sliceOfLine[0] == "query" {
+			animal, isRight := FindAnimal(sliceOfLine[1], animalMap)
+			if isRight {
+				PrintRequestedProperty(sliceOfLine[2], animal)
+			} else {
+				fmt.Println("Wrong animal name")
+			}
+		} else if sliceOfLine[0] == "newanimal" {
+			name := sliceOfLine[1]
+			animalType := sliceOfLine[2]
+			CreateNewAnimal(name, animalType, &animalMap)
+			fmt.Println("Created it!")
+		}
+	}
+}
+
+func CreateNewAnimal(name string, animalType string, m *map[string]Animal) {
+	(*m)[name] = CreateAnimal(name, strings.TrimRight(animalType, "\n"))
+	for i, v := range *m {
+		fmt.Print(i + " ")
+		fmt.Println(v)
+	}
 }
