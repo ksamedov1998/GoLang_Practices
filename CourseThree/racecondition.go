@@ -15,7 +15,7 @@ func Race() {
 	*/
 	go Inc(&number)
 	go Decr(&number)
-	time.Sleep(3000)
+	time.Sleep(300)
 }
 
 func Inc(number *int) {
