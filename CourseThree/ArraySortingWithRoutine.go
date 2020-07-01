@@ -5,16 +5,6 @@ import (
 	"sync"
 )
 
-/*
-Write a program to sort an array of integers. The program should partition the array into 4 parts,
-each of which is sorted by a different goroutine.Each partition should be of approximately
-equal size. Then the main goroutine should merge the 4 sorted sub arrays into one large sorted array.
-The program should prompt the user to input a series of integers. Each goroutine which sorts ¼ of
-the array should print the subarray that it will sort. When sorting is complete, the main goroutine
-should print the entire sorted list.
-
-*/
-
 // Sorts
 func Sort(elementList []int) {
 	var wg sync.WaitGroup
@@ -36,21 +26,54 @@ func Sort(elementList []int) {
 		go SortPartOfArray(&elementList, index, index+p4Len, &wg)
 		wg.Wait()
 		index = 0
-		MergeTwoPart(&elementList, 0, elementList[index:index+p1Len], elementList[index+p1Len:index+p1Len+p2Len])
+		MergeTwoPart(&elementList, index, CreateArray(elementList, index, index+p1Len), CreateArray(elementList, index+p1Len, index+p1Len+p2Len))
+		index += p1Len + p2Len
+		MergeTwoPart(&elementList, index, CreateArray(elementList, index, index+p3Len), CreateArray(elementList, index+p3Len, index+p3Len+p4Len))
+		MergeTwoPart(&elementList, 0, CreateArray(elementList, 0, len(elementList)/2+len(elementList)%2), CreateArray(elementList, len(elementList)/2+len(elementList)%2, len(elementList)))
 	}
+
 	PrintArray(elementList)
 }
 
+func CreateArray(list []int, index int, lastIndex int) []int {
+	var array []int
+	for i, k := index, 0; i < lastIndex; i, k = i+1, k+1 {
+		array = append(array, list[i])
+	}
+	return array
+}
+
 func MergeTwoPart(elementList *[]int, index int, p1Part []int, p2Part []int) {
-	for i, k, j := 0, 0, index; i < len(p1Part) && k < len(p2Part); j++ {
+	for i, k, j := 0, 0, index; i < len(p1Part) && k < len(p2Part); {
+		var p1Changed bool
 		if p1Part[i] <= p2Part[k] {
+			p1Changed = true
 			fmt.Printf("%d<=%d\n", p1Part[i], p2Part[k])
 			(*elementList)[j] = p1Part[i]
 			i++
 		} else {
+			p1Changed = false
 			fmt.Printf("%d>=%d\n", p1Part[i], p2Part[k])
 			(*elementList)[j] = p2Part[k]
 			k++
+		}
+		j++
+		if !(i < len(p1Part)) {
+			if p1Changed {
+				k--
+			}
+			for l := k; l < len(p2Part); l++ {
+				(*elementList)[j] = p2Part[l]
+				j++
+			}
+		} else if !(k < len(p2Part)) {
+			if p1Changed {
+				i--
+			}
+			for l := i; l < len(p1Part); l++ {
+				(*elementList)[j] = p1Part[l]
+				j++
+			}
 		}
 	}
 }
